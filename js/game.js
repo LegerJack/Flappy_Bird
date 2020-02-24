@@ -1,11 +1,11 @@
-var cvs = document.getElementById("canvas");
-var ctx = cvs.getContext("2d");
+let cvs = document.getElementById("canvas");
+let ctx = cvs.getContext("2d");
 
-var bird = new Image();
-var bg = new Image();
-var pipeUp = new Image();
-var pipeDown = new Image();
-var fg = new Image();
+let bird = new Image();
+let bg = new Image();
+let pipeUp = new Image();
+let pipeDown = new Image();
+let fg = new Image();
 
 bird.src = "img/bird.png";
 bg.src = "img/background_flapp.png";
@@ -14,38 +14,49 @@ pipeUp.src = "img/flappy_bird_pipeUp.png";
 pipeDown.src = "img/flappy_bird_pipeBottom.png";
 
 //Звуковые файлы
-var fly = new Audio();
-var score_aduio = new Audio();
+let fly = new Audio();
+let score_aduio = new Audio();
 
 fly.src = "audio/fly.mp3";
 score_aduio.src = "audio/score.mp3";
 
-var gap = 90;
+let gap = 90;
 //При нажатии на кнопку
+
+let pause = false;
+let restart;
 document.addEventListener("keydown", moveUp);
 
-function moveUp() {
-    yPos -= 20;
-    fly.play();
+function moveUp(event) {
+    if (event.keyCode === 32 || event.keyCode === 38) {
+        yPos -= 20;
+        fly.play();
+    }
+    else if (event.keyCode === 27) {
+        pause = !pause;
+    }
 }
 //Создание блоков
-var pipe = [];
+let pipe = [];
 
 pipe[0] = {
     x: cvs.width,
     y: 0
 }
 
-var score = 0;
+let score = 0;
 //Позиция птички
-var xPos = 10;
-var yPos = 150;
-var grav = 2;
-
+let xPos = 10;
+let yPos = 150;
+let grav = 2;
 function draw() {
+    if (pause) {
+        ctx.fillText("Пауза", cvs.width / 2.5, cvs.height / 2);
+        return;
+    }
     ctx.drawImage(bg, 0, 0);
 
-    for (var i = 0; i < pipe.length; i++) {
+    for (let i = 0; i < pipe.length; i++) {
         ctx.drawImage(pipeUp, pipe[i].x, pipe[i].y);
         ctx.drawImage(pipeDown, pipe[i].x, pipe[i].y + pipeUp.height + gap);
 
@@ -53,19 +64,19 @@ function draw() {
 
         if (pipe[i].x == 125) {
             pipe.push({
-                x : cvs.width,
-                y : Math.floor(Math.random() * pipeUp.height) - pipeUp.height
+                x: cvs.width,
+                y: Math.floor(Math.random() * pipeUp.height) - pipeUp.height
             });
         }
-    //Столкновение птицы
-        if(xPos + bird.width >= pipe[i].x 
-            && xPos <= pipe[i].x + pipeUp.width 
+        //Столкновение птицы
+        if (xPos + bird.width >= pipe[i].x
+            && xPos <= pipe[i].x + pipeUp.width
             && (yPos <= pipe[i].y + pipeUp.height
                 || yPos + bird.height >= pipe[i].y + pipeUp.height + gap)
-                || yPos + bird.height >= cvs.height - fg.height){
-                    location.reload(); //Перезапуск игры
-                }
-        if(pipe[i].x == 5){
+            || yPos + bird.height >= cvs.height - fg.height) {
+            location.reload(); //Перезапуск игры
+        }
+        if (pipe[i].x == 5) {
             score++;
             score_aduio.play();
         }
